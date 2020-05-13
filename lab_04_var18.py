@@ -56,16 +56,13 @@ from db import get_connection
 def authenticate(name, password):
     sql_statement = "SELECT * " \
                     "FROM users " \
-                    "WHERE name='{name}' "\
-                    "AND password='{password}';".format(
-                                                        name=name,
-                                                        password=password,
-                                                    )
+                    "WHERE name=%s"\
+                    "AND password=%s;"
     cursor = get_connection(
                             os.environ['DB_LOGIN'],
                             os.environ['DB_PASSWORD']
                             ).cursor()
-    result = cursor.execute(sql_statement).fetchone()
+    result = cursor.execute(sql_statement, [name, password]).fetchone()
     cursor.close()
     return result
 
@@ -104,7 +101,7 @@ def login_page():
         if redirect_url:
             response = flask.make_response(flask.redirect(redirect_url))
             if just_auth:
-                response.set_cookie('ssid', hmac.digest())
+                response.set_cookie('ssid', hmac.digest(), secure=True, httponly=True, samesite='Strict'))
             return response
 
         return """
