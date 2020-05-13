@@ -1,4 +1,5 @@
 # py_ver == "3.6.9"
+import cgi
 import flask
 
 
@@ -97,7 +98,7 @@ def login_page():
     already_auth = flask.request.cookies.get('ssid') == hmac.digest()
     just_auth = authenticate(name, password)
     if already_auth or just_auth:
-        redirect_url = flask.request.args.get('redirect_url', '/')
+        redirect_url = cgi.escape(flask.request.args.get('redirect_url', '/'))
         if redirect_url:
             response = flask.make_response(flask.redirect(redirect_url))
             if just_auth:
